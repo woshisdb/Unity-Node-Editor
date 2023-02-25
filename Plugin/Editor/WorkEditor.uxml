@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="height: 70%;">
+        <WorkEditorView focusable="true" name="View" style="height: 100%; width: 100%;" />
+        <ui:Label text="Label" display-tooltip-when-elided="true" name="Information" />
+    </ui:VisualElement>
+    <ui:VisualElement style="height: auto; bottom: auto; flex-direction: row; width: 100%; -unity-text-align: upper-left; align-items: stretch;">
+        <ui:Button text="ReSize" display-tooltip-when-elided="true" name="ReSize" style="width: 80px; height: 50px;" />
+        <ui:Button text="Save" display-tooltip-when-elided="true" name="Save" style="width: 80px; height: 50px;" />
+        <ui:Button text="Load" display-tooltip-when-elided="true" name="Load" style="width: 80px; -unity-text-align: middle-center; height: 50px;" />
+    </ui:VisualElement>
+    <uie:ObjectField label="Asset" name="Asset" style="width: auto;" />
+    <ui:VisualElement />
+</ui:UXML>
