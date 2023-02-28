@@ -4,6 +4,7 @@
 使用ObjectStruct用来管理一个类的所以蓝图
 </br>
 <img width="672" alt="捕获1" src="https://user-images.githubusercontent.com/49430307/221846679-eac6fca7-e688-4461-b3db-16ae3bf1f3bf.PNG">
+</br>
 通过创建WorkAsset来编写可视化脚本
 </br>
 ![image](https://user-images.githubusercontent.com/49430307/221851270-423ed659-cc90-4c87-983f-712131236771.png)
