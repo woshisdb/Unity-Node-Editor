@@ -11,7 +11,7 @@ namespace ObjectManagerAct
     /// <summary>
     /// 一系列环境变量的设置类
     /// </summary>
-    [Id("ObjectManager")]
+    [Id("ObjectManager",true)]
     public class Envirment : Decision<ObjectManager>
     {
         [Show]
@@ -56,7 +56,7 @@ namespace ObjectManagerAct
             return res;
         }
     }
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class DebugString : Decision<ObjectManager>
     {
         [Show]
@@ -83,7 +83,7 @@ namespace ObjectManagerAct
     /// <summary>
     /// 输出字符串
     /// </summary>
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class OutString : Decision<ObjectManager>
     {
         [Show]
@@ -107,7 +107,7 @@ namespace ObjectManagerAct
         }
     }
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class Test : Decision<ObjectManager>
     {
         [Show]
@@ -130,7 +130,7 @@ namespace ObjectManagerAct
     }
 
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class SelectString : Decision<ObjectManager>
     {
         [Show]
@@ -173,7 +173,7 @@ namespace ObjectManagerAct
     }
 
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class ChoseSelect : Decision<ObjectManager>
     {
         [Show]
@@ -211,7 +211,7 @@ namespace ObjectManagerAct
         }
     }
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class WaitTime : Decision<ObjectManager>
     {
         [Show]
@@ -244,7 +244,7 @@ namespace ObjectManagerAct
     }
 
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class ExeWorkAsset : Decision<ObjectManager>
     {
         [Show]
@@ -305,31 +305,8 @@ namespace ObjectManagerAct
             return pair;
         }
     }
-    //[Id("ObjectManager")]
-    //public class GetEnvirVal : Decision<ObjectManager>
-    //{
-    //    public GetEnvirVal()
-    //    {
-    //        InVal.Add(new Dictval("name",typeof(object)));
-    //        OutVal.Add(new Dictval("val",typeof(object)));
-    //    }
-    //    public override void Begin(WorkProcess workProcess)
-    //    {
 
-    //    }
-    //    public override void Execute(WorkProcess workProcess)
-    //    {
-    //    }
-    //    public override bool HaveEnd(WorkProcess workProcess, out string result)
-    //    {
-    //        var x=workProcess.workAsset.envirVal[GetInputVal<string>(workProcess, "name")];
-    //        setDictVal(workProcess, "val", x);
-    //        result = "succ";
-    //        return true;
-    //    }
-    //}
-
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class OutValue : Decision<ObjectManager>
     {
         public OutValue()
@@ -352,7 +329,7 @@ namespace ObjectManagerAct
         }
     }
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class Conversation : Decision<ObjectManager>
     {
         [Show]
@@ -393,7 +370,7 @@ namespace ObjectManagerAct
     /// <summary>
     /// 暂停回合
     /// </summary>
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class Stop : Decision<ObjectManager>
     {
         public Stop()
@@ -415,7 +392,7 @@ namespace ObjectManagerAct
         }
     }
     
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class ObjectMap : Decision<ObjectManager>
     {
         public ObjectMap()
@@ -465,6 +442,7 @@ namespace ObjectManagerAct
             return res;
         }
     }
+    [Id("ObjectManager", true)]
     //根据对象监听
     public class Listen : Decision<ObjectManager>
     {
@@ -503,7 +481,7 @@ namespace ObjectManagerAct
             return true;
         }
     }
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class IsNull : Decision<ObjectManager>
     {
         public IsNull()
@@ -536,7 +514,7 @@ namespace ObjectManagerAct
         }
     }
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class RandomCheck : Decision<ObjectManager>
     {
         /// <summary>
@@ -568,7 +546,7 @@ namespace ObjectManagerAct
 
 
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class OutVal<T> : Decision<ObjectManager>
     {
         [Show]
@@ -594,14 +572,14 @@ namespace ObjectManagerAct
 
 
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class OutBool:OutVal<bool>
     {
 
     }
 
 
-    [Id("ObjectManager")]
+    [Id("ObjectManager", true)]
     public class OutWorkAsset : OutVal<WorkAsset>
     {
 

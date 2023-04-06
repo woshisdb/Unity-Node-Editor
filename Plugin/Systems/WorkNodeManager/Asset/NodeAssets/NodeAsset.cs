@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 namespace NodeEditor
 {
 
-    [CreateAssetMenu(fileName = "NewNodeAsset", menuName = "Assets/NodeAsset")]
+    //[CreateAssetMenu(fileName = "NewNodeAsset", menuName = "Assets/NodeAsset")]
     public class NodeAsset : SerializedScriptableObject
     {
         /// <summary>

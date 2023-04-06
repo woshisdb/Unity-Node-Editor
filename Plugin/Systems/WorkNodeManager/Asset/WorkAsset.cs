@@ -48,10 +48,10 @@ namespace NodeEditor
             }
         }
     }
-    public enum WorkAssetEnum
+    public enum PrivateEnum
     {
-        Public,
-        Private
+        Private,
+        Public
     }
     /// <summary>
     /// 图的数据,类似于一个程序的源代码
@@ -59,7 +59,8 @@ namespace NodeEditor
     [CreateAssetMenu(fileName = "NewWorkAsset", menuName = "Assets/ActivityObject/WorkAsset")]
     public class WorkAsset : SerializedScriptableObject
     {
-        public WorkAssetEnum workAssetEnum = WorkAssetEnum.Public;
+        public bool isVirture;
+        public PrivateEnum workAssetEnum = PrivateEnum.Public;
         /// <summary>
         /// 所有节点
         /// </summary>
@@ -68,7 +69,8 @@ namespace NodeEditor
         public int endNo = -1;
         public int breakNo = -1;
         public int judgeNo = -1;
-        public int EnvirNo = -1;//环境节点
+        public int EnvirNo = -1;
+        //环境节点
         public List<GroupAsset> groups = new List<GroupAsset>();
         /// <summary>
         /// 一系列的行为节点
@@ -87,23 +89,12 @@ namespace NodeEditor
         /// </summary>
         public Dictionary<string, ObjectStruct> relate = new Dictionary<string, ObjectStruct>();
         public List<Dictval> dictvals = new List<Dictval>();
-        [Tooltip("专为此流程图可见的方法")]
-        public MonoScript privateVal;
-        public Type[] GetPrivateVal()
-        {
-            if (privateVal != null)
-                return BasicFunction.GetTypesInNamespace(Assembly.GetExecutingAssembly(), privateVal.name + "PAct");
-            return new Type[] { };
-        }
         /// <summary>
         /// 生成节点源代码
         /// </summary>
         public void GenerateNodeSourceCode(DecisionNode node)
         {
         }
-        public List<WorkAsset> PrivateWork;
-
-
         /// <summary>
         /// //结束整个项目返回-1,否则返回序号
         /// </summary>

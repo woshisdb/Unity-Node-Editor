@@ -25,82 +25,121 @@ public class EditorNodeManager
         if (baseType == null) return false;
         return IsAssignableToOpenGenericType(baseType, genericType);
     }
+
+    static void GenerateDecision(ObjectStruct objectStruct,ref List<SearchTreeEntry> entries,bool root=false)
+    {
+        Dictionary<string, List<Type>> keys = new Dictionary<string, List<Type>>();
+        foreach (var v in objectStruct.decisionDict)
+        {
+            IdAttribute id = v.GetCustomAttribute<IdAttribute>();
+            if (id != null)
+            {
+                if (keys.ContainsKey(id.name))
+                {
+                    keys[id.name].Add(v);
+                }
+                else
+                {
+                    keys.Add(id.name, new List<Type>());
+                    keys[id.name].Add(v);
+                }
+            }
+        }
+        entries.Add(new SearchTreeGroupEntry(new GUIContent(objectStruct.name)) { level = 2 });
+        foreach (var k in keys)
+        {
+            entries.Add(new SearchTreeGroupEntry(new GUIContent(k.Key)) { level = 3 });      //添加了一个二级菜单
+            foreach (var v in k.Value)
+            {
+                if(!(v.GetCustomAttribute<IdAttribute>().privateEnum==PrivateEnum.Private&&root==false))
+                entries.Add(new SearchTreeEntry(new GUIContent(v.Name)) { level = 4, userData = new GroupEntity(new DecisionPort(v.Name, v), "Decision") });
+            }
+        }
+        if (objectStruct.script.GetClass() != null && objectStruct.script.GetClass().BaseType != null)
+        {
+            if(objectStruct.parent)
+            {
+                GenerateDecision(objectStruct.parent, ref entries);
+            }
+        }
+    }
+
+    static void GenerateBehavior(ObjectStruct objectStruct, ref List<SearchTreeEntry> entries, bool root = false)
+    {
+        Dictionary<string, List<Type>> keys = new Dictionary<string, List<Type>>();
+        foreach (var v in objectStruct.behaviorDict)
+        {
+            IdAttribute id = v.GetCustomAttribute<IdAttribute>();
+            if (id != null)
+            {
+                if (keys.ContainsKey(id.name))
+                {
+                    keys[id.name].Add(v);
+                }
+                else
+                {
+                    keys.Add(id.name, new List<Type>());
+                    keys[id.name].Add(v);
+                }
+            }
+        }
+        entries.Add(new SearchTreeGroupEntry(new GUIContent(objectStruct.name)) { level = 2 });
+        foreach (var k in keys)
+        {
+            entries.Add(new SearchTreeGroupEntry(new GUIContent(k.Key)) { level = 3 });      //添加了一个二级菜单
+            foreach (var v in k.Value)
+            {
+                if (!(v.GetCustomAttribute<IdAttribute>().privateEnum == PrivateEnum.Private && root == false))
+                    entries.Add(new SearchTreeEntry(new GUIContent(v.Name)) { level = 4, userData = new GroupEntity(new DecisionPort(v.Name, v), "Behavior") });
+            }
+        }
+        if (objectStruct.script.GetClass() != null && objectStruct.script.GetClass().BaseType != null)
+        {
+            if (objectStruct.parent)
+            {
+                GenerateBehavior(objectStruct.parent, ref entries);
+            }
+        }
+    }
+
+    static void GenerateWork(ObjectStruct objectStruct, ref List<SearchTreeEntry> entries, bool root = false)
+    {
+        entries.Add(new SearchTreeGroupEntry(new GUIContent(objectStruct.name)) { level = 2 });
+        foreach (var v in objectStruct.workAssetDict)
+        {
+            if (!(root == false&& v.workAssetEnum==PrivateEnum.Private))
+                entries.Add(new SearchTreeEntry(new GUIContent(v.name)) { level = 3, userData = new GroupEntity(v, "WorkNode") });
+        }
+        if(objectStruct.parent)
+        {
+            GenerateWork(objectStruct.parent,ref entries);
+        }
+    }
     public static List<SearchTreeEntry> CreateSearchList()
     {
         var entries = new List<SearchTreeEntry>();
         if (WorkEditor.workAsset != null)
         {
             entries.Add(new SearchTreeGroupEntry(new GUIContent("Create")));                        //添加了一个一级菜单
-            /************************节点菜单的创建*************************************************/
-            //entries.Add(new SearchTreeGroupEntry(new GUIContent("Create Node")) { level = 1 });
-            /***************************决定菜单的创建***************************************************/
             if (WorkEditor.workAsset.root != null)
             {
                 entries.Add(new SearchTreeGroupEntry(new GUIContent("DecisionNode")) { level = 1 });      //添加了一个二级菜单
-                Dictionary<string, List<Type>> keys=new Dictionary<string, List<Type>>();
-                foreach (var v in WorkEditor.workAsset.root.decisionDict) 
-                {
-                    IdAttribute id= v.GetCustomAttribute<IdAttribute>();
-                    if(id!=null)
-                    {
-                        if(keys.ContainsKey(id.name))
-                        {
-                            keys[id.name].Add(v);
-                        }
-                        else
-                        {
-                            keys.Add(id.name, new List<Type>());
-                            keys[id.name].Add(v);
-                        }
-                    }
-                }
-                foreach(var k in keys)
-                {
-                    entries.Add(new SearchTreeGroupEntry(new GUIContent(k.Key)) { level = 2 });      //添加了一个二级菜单
-                    foreach(var v in k.Value)
-                    {
-                        entries.Add(new SearchTreeEntry(new GUIContent(v.Name)) { level = 3, userData = new GroupEntity(new DecisionPort(v.Name, v), "Decision") });
-                    }
-                }
-                if (WorkEditor.workAsset.privateVal != null)
-                {
-                    entries.Add(new SearchTreeGroupEntry(new GUIContent("PrivateDecision")) { level = 1 });      //添加了一个二级菜单
-                    foreach (var v in WorkEditor.workAsset.GetPrivateVal().Where(x=> IsAssignableToOpenGenericType(x, typeof(Decision<>) )))//每一个节点都遍历
-                    {
-                        entries.Add(new SearchTreeEntry(new GUIContent(v.Name)) { level = 2, userData = new GroupEntity(new DecisionPort(v.Name, v), "Decision") });
-                    }
-                }
+                GenerateDecision(WorkEditor.workAsset.root,ref entries,true);
             }
-            ///////////////////////////////////////////////////////////////////工作节点                                                                            //
+            ///////////////////////////////////////////////////////////////////工作节点
             if (WorkEditor.workAsset.root!=null&&WorkEditor.workAsset.root.workAssetDict!=null)
             {
                 entries.Add(new SearchTreeGroupEntry(new GUIContent("WorkNode")) { level = 1 });      //添加了一个二级菜单
-                foreach (var v in WorkEditor.workAsset.root.workAssetDict)
-                {
-                    if(v.workAssetEnum==WorkAssetEnum.Public)
-                        entries.Add(new SearchTreeEntry(new GUIContent(v.name)) { level = 2, userData = new GroupEntity(v, "WorkNode") });
-                }
-
-                entries.Add(new SearchTreeGroupEntry(new GUIContent("PrivateWorkNode")) { level = 1 });      //添加了一个二级菜单
-                foreach (var v in WorkEditor.workAsset.PrivateWork)
-                {
-                    entries.Add(new SearchTreeEntry(new GUIContent(v.name)) { level = 2, userData = new GroupEntity(v, "WorkNode") });
-                }
-
+                GenerateWork(WorkEditor.workAsset.root,ref entries,true);
             }
-
-            
-
             entries.Add(new SearchTreeGroupEntry(new GUIContent("NeededNode")) { level = 1 });      //添加了一个二级菜单
             entries.Add(new SearchTreeEntry(new GUIContent("BeginNode")) { level = 2, userData = new GroupEntity(typeof(BeginNode), "BeginNode") });
             entries.Add(new SearchTreeEntry(new GUIContent("EndNode")) { level = 2, userData = new GroupEntity(typeof(EndNode), "EndNode") });
-            //entries.Add(new SearchTreeEntry(new GUIContent("BreakNode")) { level = 2, userData = new GroupEntity(typeof(BreakNode), "BreakNode") });
-            //entries.Add(new SearchTreeEntry(new GUIContent("JudgeNode")) { level = 2, userData = new GroupEntity(typeof(JudgeNode), "JudgeNode") });
             /*******************************Group菜单的创建*******************************************/
             entries.Add(new SearchTreeGroupEntry(new GUIContent("Create Group")) { level = 1 });                        //添加了一个一级菜单
             /*******************************Group菜单的创建*******************************************/
             entries.Add(new SearchTreeEntry(new GUIContent("NoteGroup")) { level = 2, userData = new GroupEntity("Note", "Group") });
-            /************************************************************************************/
+            /**************************************OtherWorkNode**********************************************/
             if (WorkEditor.workAsset.relate != null)
             {
                 entries.Add(new SearchTreeGroupEntry(new GUIContent("OtherWorkNode")) { level = 1 });      //添加了一个二级菜单
@@ -109,27 +148,30 @@ public class EditorNodeManager
                     entries.Add(new SearchTreeGroupEntry(new GUIContent(v.Key)) { level = 2 });      //添加了一个二级菜单
                     foreach (var w in v.Value.workAssetDict)
                     {
-                        if (w.workAssetEnum == WorkAssetEnum.Public)
+                        if (w.workAssetEnum == PrivateEnum.Public)
                             entries.Add(new SearchTreeEntry(new GUIContent(w.name)) { level = 3, userData = new GroupEntity(w, "OtherWorkNode") });
                     }
                 }
             }
-            /**************************************************/
+            /*********************BehaviorNode*****************************/
             if (WorkEditor.workAsset.relate != null)
             {
                 entries.Add(new SearchTreeGroupEntry(new GUIContent("BehaviorNode")) { level = 1 });      //添加了一个二级菜单
                 foreach (var v in WorkEditor.workAsset.relate)//每一个节点都遍历
                 {
                     entries.Add(new SearchTreeGroupEntry(new GUIContent(v.Key)) { level = 2 });      //添加了一个二级菜单
-                    foreach (var u in v.Value.behaviorDict)
-                    {
-                        entries.Add(new SearchTreeEntry(new GUIContent(u.Name)) { level = 3, userData = new GroupEntity(new BehaviorPort(v.Key, u), "Behavior") });
-                    }
+                    GenerateBehavior(v.Value, ref entries,true);
                 }
             }
         }
         return entries;
     }
+    /// <summary>
+    /// 创建节点菜单
+    /// </summary>
+    /// <param name="nodetype"></param>
+    /// <param name="localMousePosition"></param>
+    /// <returns></returns>
     public static GraphElement CreateNodeMenu(GroupEntity nodetype,Vector2 localMousePosition)
     {
         if (nodetype.data == "WorkNode")

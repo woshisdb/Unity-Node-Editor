@@ -29,6 +29,8 @@ namespace NodeEditor
             if (baseType == null) return false;
             return IsAssignableToOpenGenericType(baseType, genericType);
         }
+        [ReadOnly]
+        public ObjectStruct parent;
         public MonoScript script;
         public string sourceName { get => script.GetClass().Name; }//变量的名字
         public List<Type> behaviorDict;//活动字典,和这个活动相互转化的活动
@@ -37,7 +39,6 @@ namespace NodeEditor
         [Button("Init")]
         public void Init()//生成所有attrribute相关的行为
         {
-            //Debug.Log(this.name);
             Type type = Assembly.GetExecutingAssembly().GetType(sourceName);
             behaviorDict = new List<Type>();
             decisionDict = new List<Type>();
@@ -60,9 +61,10 @@ namespace NodeEditor
                 if (workAssetDict.Contains(i) == false)
                     workAssetDict.Add(i);
             }
-            if (type.BaseType != null)
+            if (type != null&& type.BaseType != null)
             {
                 Init(type.BaseType.Name);
+                parent= AssetDatabase.FindAssets("t:" + typeof(ObjectStruct).Name).Select(guid => AssetDatabase.LoadAssetAtPath<ObjectStruct>(AssetDatabase.GUIDToAssetPath(guid))).ToList().Find(t => t is ObjectStruct && t.sourceName == type.BaseType.Name);
             }
         }
         private void Init(string sourceName)//生成所有attrribute相关的行为
@@ -86,7 +88,7 @@ namespace NodeEditor
                     }
                 }
             }
-            if (faobj != null)
+            if (faobj != null)//初始化对应的objectstruct；
             {
                 faobj.Init();
                 foreach (var i in faobj.workAssetDict)

@@ -34,7 +34,7 @@ public static class ElementFactory
         {
             return new EnumElemnet(PropertyType, Name, baseNode);
         }
-        //else if (PropertyType.GetGenericTypeDefinition() == typeof(List<>))//如果是List的话
+        //如果是List的话
         else if(BasicFunction.IsGenericList(PropertyType))
         {
             return new ListElement(PropertyType, Name, baseNode);

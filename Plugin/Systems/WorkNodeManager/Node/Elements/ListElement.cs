@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 
 namespace NodeEditor
 {
+    
     public class ListElement : BaseElement
     {
         VisualElement front;
@@ -30,18 +31,7 @@ namespace NodeEditor
             content = new VisualElement();
             Add(content);
         }
-        bool NeedDfs(Type contentType)
-        {
-            bool needDfs = false;
-            foreach (var x in contentType.GetFields())
-            {
-                if (x.GetCustomAttribute<ShowAttribute>() != null)
-                {
-                    needDfs = true;
-                }
-            }
-            return needDfs;
-        }
+
         public VisualElement AddElement()
         {
             var val = new VisualElement();
@@ -50,23 +40,23 @@ namespace NodeEditor
             button.text = "remove";
             button.clicked += (() => { content.Remove(val); });
             val.Add(button);
-
-            if (NeedDfs(contentType) == false)//不用迭代
-            {
-                var x = ElementFactory.GetElement(contentType, "val", baseNode);
-                val.Add(x);
-            }
-            else//表示需要迭代
-            {
-                foreach (var pi in contentType.GetFields())//获取一系列property
-                {
-                    if (pi.GetCustomAttribute<ShowAttribute>() != null)
-                    {
-                        var x = ElementFactory.GetElement(pi.FieldType, pi.Name, baseNode);
-                        val.Add(x);
-                    }
-                }
-            }
+            val.Add(ElementFactory.GetElement(contentType,"val",baseNode));
+            //if (NeedDfs(contentType) == false)//不用迭代
+            //{
+            //    var x = ElementFactory.GetElement(contentType, "val", baseNode);
+            //    val.Add(x);
+            //}
+            //else//表示需要迭代
+            //{
+            //    foreach (var pi in contentType.GetFields())//获取一系列property
+            //    {
+            //        if (pi.GetCustomAttribute<ShowAttribute>() != null)
+            //        {
+            //            var x = ElementFactory.GetElement(pi.FieldType, pi.Name, baseNode);
+            //            val.Add(x);
+            //        }
+            //    }
+            //}
             content.Add(val);
             baseNode.RefreshExpandedState();
             return val;
@@ -83,22 +73,23 @@ namespace NodeEditor
             foreach (var x in content.Children())
             {
                 dynamic ele = null;
-                if (NeedDfs(contentType) == false)
-                {
-                    ele = x.Q<BaseElement>("val").GetVal();
-                }
-                else
-                {
-                    ele = Activator.CreateInstance(contentType);//创建一个type对象
-                    foreach (var pi in contentType.GetFields())//获取一系列property
-                    {
-                        if (pi.GetCustomAttribute<ShowAttribute>() != null)
-                        {
-                            var y = x.Q<BaseElement>(pi.Name);
-                            pi.SetValue(ele, y.GetVal());
-                        }
-                    }
-                }
+                ele= x.Q<BaseElement>("val").GetVal();
+                //if (NeedDfs(contentType) == false)
+                //{
+                //    ele = x.Q<BaseElement>("val").GetVal();
+                //}
+                //else
+                //{
+                //    ele = Activator.CreateInstance(contentType);//创建一个type对象
+                //    foreach (var pi in contentType.GetFields())//获取一系列property
+                //    {
+                //        if (pi.GetCustomAttribute<ShowAttribute>() != null)
+                //        {
+                //            var y = x.Q<BaseElement>(pi.Name);
+                //            pi.SetValue(ele, y.GetVal());
+                //        }
+                //    }
+                //}
                 res.Add(ele);
             }
             return res;
@@ -111,22 +102,7 @@ namespace NodeEditor
             foreach (var x in res)
             {
                 var y = AddElement();
-                if (NeedDfs(contentType) == false)
-                {
-                    y.Q<BaseElement>("val").SetVal(x);
-                }
-                else
-                {
-                    foreach (var pi in contentType.GetFields())//获取一系列property
-                    {
-                        if (pi.GetCustomAttribute<ShowAttribute>() != null)
-                        {
-                            object temp;
-                            temp = pi.GetValue(x);
-                            y.Q<BaseElement>(pi.Name).SetVal(temp);
-                        }
-                    }
-                }
+                y.Q<BaseElement>("val").SetVal(x);
             }
         }
     }

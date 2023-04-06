@@ -133,25 +133,82 @@ namespace NodeEditor
 
     public class ObjectElemnet : BaseElement
     {
+        bool NeedDfs(Type contentType)
+        {
+            bool needDfs = false;
+            foreach (var x in contentType.GetFields())
+            {
+                if (x.GetCustomAttribute<ShowAttribute>() != null)
+                {
+                    needDfs = true;
+                }
+            }
+            return needDfs;
+        }
         ObjectField field;
         public ObjectElemnet(Type type, string Name, BaseNode baseNode) : base(type, Name, baseNode)
         {
-            ObjectField objectField = new ObjectField();
-            objectField.objectType = type;
-            name = Name;
-            objectField.label = Name;
-            Add(objectField);
-            field = objectField;
+            Add(new Label(type.Name));
+            this.type = type;
+            this.name = Name;
+            if (NeedDfs(type) == false)
+            {
+                field = new ObjectField();
+                field.objectType = type;
+                Add(field);
+            }
+            else
+            {
+                foreach (var pi in type.GetFields())//获取一系列property
+                {
+                    if (pi.GetCustomAttribute<ShowAttribute>() != null)
+                    {
+                        var x = ElementFactory.GetElement(pi.FieldType, pi.Name, baseNode);
+                        Add(x);
+                    }
+                }
+            }
         }
 
         public override object GetVal()
         {
-            return field.value;
+            if (NeedDfs(type) == false)
+            {
+                return field.value;
+            }
+            else
+            {
+                object ele = Activator.CreateInstance(type);//创建一个type对象
+                foreach (var pi in type.GetFields())//获取一系列property
+                {
+                    if (pi.GetCustomAttribute<ShowAttribute>() != null)
+                    {
+                        var y = this.Q<BaseElement>(pi.Name);
+                        pi.SetValue(ele, y.GetVal());
+                    }
+                }
+                return ele;
+            }
         }
 
         public override void SetVal(object val)
         {
-            field.value = (UnityEngine.Object)val;
+            if (NeedDfs(type) == false)
+            {
+                field.value = (UnityEngine.Object)val;
+            }
+            else
+            {
+                foreach (var pi in type.GetFields())//获取一系列property
+                {
+                    if (pi.GetCustomAttribute<ShowAttribute>() != null)
+                    {
+                        object temp;
+                        temp = pi.GetValue(val);
+                        this.Q<BaseElement>(pi.Name).SetVal(temp);
+                    }
+                }
+            }
         }
     }
 }
